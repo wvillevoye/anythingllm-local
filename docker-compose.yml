@@ -11,6 +11,10 @@ services:
     restart: unless-stopped
     volumes:
       - ollama:/root/.ollama
+    # Zuiniger met videogeheugen (GTX 1070, 8 GB): zonder dit past een 9B-model niet helemaal in de GPU en wordt het traag.
+    environment:
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
     # NVIDIA-GPU (vereist NVIDIA Container Toolkit / WSL2-GPU); zonder GPU: verwijder dit blok
     deploy:
       resources:
