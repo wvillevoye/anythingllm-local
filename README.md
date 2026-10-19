@@ -7,6 +7,7 @@ Docker Compose-opzet voor een volledig lokale RAG-omgeving: [AnythingLLM](https:
 ```powershell
 docker compose up -d
 docker compose exec ollama ollama pull qwen3:8b
+docker compose exec ollama ollama pull gemma2:9b
 docker compose exec ollama ollama pull nomic-embed-text
 ```
 
