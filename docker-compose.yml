@@ -1,4 +1,4 @@
-# Lokale AnythingLLM + Ollama voor ConMark. Documenten verlaten dit netwerk niet.
+# Lokale AnythingLLM + Ollama voor MarkFluence. Documenten verlaten dit netwerk niet.
 # Start:  docker compose up -d
 # Eenmalig modellen ophalen (daarna werkt alles zonder internet):
 #   docker compose exec ollama ollama pull ${LLM_MODEL:-qwen3:8b}
@@ -11,10 +11,13 @@ services:
     restart: unless-stopped
     volumes:
       - ollama:/root/.ollama
-    # Zuiniger met videogeheugen (GTX 1070, 8 GB): zonder dit past een 9B-model niet helemaal in de GPU en wordt het traag.
+    # Zuiniger met videogeheugen (RTX 4060 Laptop, 8 GB): zonder dit past een 9B-model niet helemaal in de GPU en wordt het traag.
     environment:
       OLLAMA_FLASH_ATTENTION: "1"
       OLLAMA_KV_CACHE_TYPE: q8_0
+      # Model blijft geladen (standaard 5 min) en maar één context-slot, zodat het in 8 GB videogeheugen past.
+      OLLAMA_KEEP_ALIVE: "24h"
+      OLLAMA_NUM_PARALLEL: "1"
     # NVIDIA-GPU (vereist NVIDIA Container Toolkit / WSL2-GPU); zonder GPU: verwijder dit blok
     deploy:
       resources:
@@ -38,6 +41,8 @@ services:
       OLLAMA_BASE_PATH: http://ollama:11434
       OLLAMA_MODEL_PREF: ${LLM_MODEL:-qwen3:8b}
       OLLAMA_MODEL_TOKEN_LIMIT: "8192"
+      # AnythingLLM stuurt zelf een keep-alive mee (standaard 300 s) en negeert daarmee OLLAMA_KEEP_ALIVE van Ollama.
+      OLLAMA_KEEP_ALIVE_TIMEOUT: "86400"
       EMBEDDING_ENGINE: ollama
       EMBEDDING_BASE_PATH: http://ollama:11434
       EMBEDDING_MODEL_PREF: nomic-embed-text
