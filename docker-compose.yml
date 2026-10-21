@@ -3,6 +3,7 @@
 # Eenmalig modellen ophalen (daarna werkt alles zonder internet):
 #   docker compose exec ollama ollama pull ${LLM_MODEL:-qwen3:8b}
 #   docker compose exec ollama ollama pull nomic-embed-text
+#   docker compose exec ollama ollama pull bge-m3     # meertalige embedder, te kiezen in MarkFluence (tabblad Embedder)
 # Daarna AnythingLLM openen op http://localhost:3001, workspace + API-key aanmaken.
 
 services:
@@ -45,7 +46,9 @@ services:
       OLLAMA_KEEP_ALIVE_TIMEOUT: "86400"
       EMBEDDING_ENGINE: ollama
       EMBEDDING_BASE_PATH: http://ollama:11434
-      EMBEDDING_MODEL_PREF: nomic-embed-text
+      # Net als LLM_MODEL: zet EMBEDDING_MODEL in .env. Wisselt MarkFluence de embedder (tabblad Embedder), zet hem dan hier ook,
+      # anders wint deze waarde na het opnieuw aanmaken van de container en past de index niet meer bij de embedder.
+      EMBEDDING_MODEL_PREF: ${EMBEDDING_MODEL:-nomic-embed-text}
       EMBEDDING_MODEL_MAX_CHUNK_LENGTH: "8192"
       VECTOR_DB: lancedb
     volumes:

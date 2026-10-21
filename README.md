@@ -9,6 +9,7 @@ docker compose up -d
 docker compose exec ollama ollama pull qwen3:8b
 docker compose exec ollama ollama pull gemma2:9b-instruct-q4_K_M
 docker compose exec ollama ollama pull nomic-embed-text
+docker compose exec ollama ollama pull bge-m3
 ```
 
 Open daarna <http://localhost:3001>, maak een workspace en een API-key aan.
@@ -26,6 +27,22 @@ LLM_MODEL=qwen3:4b
 Haal het model op met `ollama pull` en maak AnythingLLM opnieuw aan: `docker compose up -d --force-recreate anythingllm`.
 
 `LLM_MODEL` is alleen de standaard van AnythingLLM zelf. In MarkFluence kies je het antwoordmodel in het beheerscherm (tabblad Antwoordmodel), en alleen uit de lijst `AnythingLlm:ToegestaneModellen` in `appsettings.json`.
+
+## Andere embedder
+
+De embedder bepaalt hoe goed zoeken is. Standaard is dat `nomic-embed-text` (vooral Engels); `bge-m3` is meertalig en past mogelijk beter bij Nederlandse documenten. Haal beide modellen op met `ollama pull` (zie Gebruik). De modelnaam moet exact overeenkomen met `ollama list`.
+
+**Wisselen in MarkFluence:** kies de embedder op het tabblad *Embedder* van het beheerscherm, alleen uit de lijst `AnythingLlm:ToegestaneEmbedders` in `appsettings.json`. MarkFluence zet hem via de API van AnythingLLM en bouwt de index daarna opnieuw op, want de vectoren van twee embedders kunnen niet gemengd worden (`nomic-embed-text` 768 dimensies, `bge-m3` 1024). Zoeken geeft in die tijd weinig of niets terug.
+
+**Zet de keuze ook in `.env`** naast `docker-compose.yml`, anders wint de waarde uit de compose na het opnieuw aanmaken van de container en past de index niet meer bij de embedder:
+
+```
+EMBEDDING_MODEL=bge-m3
+```
+
+Past de index na een herstart toch niet meer bij de embedder, kies dan in MarkFluence opnieuw de embedder of klik in het beheerscherm op *Index leegmaken en opbouwen*. Of de wisseling via de API een herstart overleeft is nog niet nagegaan; de regel in `.env` maakt dat onnodig.
+
+Een embedder heeft zijn eigen relevantiedrempel (`MinimumScore` bij de embedder in `appsettings.json`); meet die met de Score-meter. De vergelijking voor en na staat in MarkFluence onder *Model, prompt en problemen oplossen*.
 
 ## GPU
 
